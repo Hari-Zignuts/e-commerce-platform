@@ -10,6 +10,9 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { AddressesModule } from './modules/addresses/addresses.module';
 import { ConfigAppModule } from './modules/config/config.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { dataSourceOptions } from './database/data-source-options';
+import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
@@ -22,8 +25,15 @@ import { ConfigAppModule } from './modules/config/config.module';
     AddressesModule,
     OrdersModule,
     ConfigAppModule,
+    TypeOrmModule.forRoot(dataSourceOptions),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(readonly dataSource: DataSource) {
+    console.log(
+      `Database connection to ${dataSource.driver.database}: ${dataSource.isConnected}`,
+    );
+  }
+}
