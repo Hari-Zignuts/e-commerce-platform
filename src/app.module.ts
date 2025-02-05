@@ -9,6 +9,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { AddressesModule } from './modules/addresses/addresses.module';
+import { ConfigAppModule } from './modules/config/config.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AddressesModule } from './modules/addresses/addresses.module';
     RolesModule,
     AddressesModule,
     OrdersModule,
+    ConfigAppModule,
   ],
   controllers: [AppController],
   providers: [AppService],
