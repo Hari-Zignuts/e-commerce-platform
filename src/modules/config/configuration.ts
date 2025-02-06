@@ -7,5 +7,6 @@ export default () => ({
     user: process.env.DB_USER || 'user',
     password: process.env.DB_PASSWORD || 'password',
     database: process.env.DB_NAME || 'nestjs_db',
+    jwt: process.env.JWT_SECRET || 'jwt_secret',
   },
 });

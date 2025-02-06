@@ -30,7 +30,7 @@ export class User {
   @Column({ length: 50 })
   lastName: string;
 
-  @Column({ length: 25 })
+  @Column({ length: 255 })
   password: string;
 
   @CreateDateColumn()
