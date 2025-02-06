@@ -11,8 +11,8 @@ import { RolesModule } from './modules/roles/roles.module';
 import { AddressesModule } from './modules/addresses/addresses.module';
 import { ConfigAppModule } from './modules/config/config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { dataSourceOptions } from './database/data-source-options';
 import { DataSource } from 'typeorm';
+import { dataSourceOptions } from './database/data-source';
 
 @Module({
   imports: [
