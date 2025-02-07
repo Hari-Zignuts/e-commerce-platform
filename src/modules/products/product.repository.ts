@@ -34,7 +34,7 @@ export class ProductRepository {
 
     return await this.productRepository.findOne({
       where: { id: product.id },
-      relations: ['category', 'images'],
+      relations: ['category', 'images', 'stock'],
     });
   }
 

@@ -58,7 +58,6 @@ export class ProductsController {
       createProductDTO,
       files,
     );
-    console.log(product);
     return {
       message: 'Product created',
       product,
