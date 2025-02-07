@@ -26,12 +26,15 @@ export class CategoryRepository {
 
   async findOneCategoryById(id: string): Promise<Category | null> {
     try {
-      return await this.categoryRepository.findOneBy({
-        id,
-        deletedAt: IsNull(),
+      return await this.categoryRepository.findOne({
+        where: {
+          id: id,
+          deletedAt: IsNull(),
+        },
       });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.log('here also');
       throw new HttpException(
         ResponseMessages.GENERAL.DATABASE_ERROR,
         HttpStatus.INTERNAL_SERVER_ERROR,

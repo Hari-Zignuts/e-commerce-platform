@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -41,7 +42,11 @@ export class Product {
   @ManyToOne(() => Category, (category) => category.products)
   category: Category;
 
-  @OneToOne(() => Stock, (stock) => stock.product)
+  @OneToOne(() => Stock, (stock) => stock.product, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
   stock: Stock;
 
   @OneToMany(() => Order, (order) => order.product)
@@ -50,6 +55,9 @@ export class Product {
   @OneToMany(() => LikeProduct, (like) => like.product)
   likes: LikeProduct[];
 
-  @OneToMany(() => Image, (image) => image.product)
+  @OneToMany(() => Image, (image) => image.product, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   images: Image[];
 }

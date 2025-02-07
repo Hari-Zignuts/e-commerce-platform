@@ -9,6 +9,6 @@ export class Stock {
   @Column({ type: 'int', default: 0 })
   stock: number;
 
-  @OneToOne(() => Product, (product) => product.stock)
+  @OneToOne(() => Product, (product) => product.stock, { onDelete: 'CASCADE' })
   product: Product;
 }

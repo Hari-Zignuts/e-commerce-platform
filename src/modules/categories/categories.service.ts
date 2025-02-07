@@ -3,6 +3,7 @@ import { CategoryRepository } from './category.repository';
 import { CreateCategoryDTO } from './dto/create-category-dto';
 import { Category } from './category.entity';
 import { ResponseMessages } from 'src/common/constants/response-messages';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class CategoriesService {
@@ -20,6 +21,12 @@ export class CategoriesService {
   }
 
   async getOneCategoryById(id: string): Promise<Category> {
+    if (!isUUID(id)) {
+      throw new HttpException(
+        ResponseMessages.CATEGORY.INVALID_ID,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const cateogry = await this.categoryRepository.findOneCategoryById(id);
     if (!cateogry) {
       throw new HttpException(
@@ -31,6 +38,12 @@ export class CategoriesService {
   }
 
   async deleteOneCategoryById(id: string): Promise<Category> {
+    if (!isUUID(id)) {
+      throw new HttpException(
+        ResponseMessages.CATEGORY.INVALID_ID,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const category = await this.categoryRepository.findOneCategoryById(id);
     if (!category) {
       throw new HttpException(

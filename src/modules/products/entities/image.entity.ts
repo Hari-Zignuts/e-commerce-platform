@@ -39,6 +39,8 @@ export class Image {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Product, (product) => product.images)
+  @ManyToOne(() => Product, (product) => product.images, {
+    onDelete: 'CASCADE',
+  })
   product: Product;
 }

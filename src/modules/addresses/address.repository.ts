@@ -25,9 +25,11 @@ export class AddressRepository {
 
   async findOneAddressById(id: string): Promise<Address | null> {
     try {
-      return await this.addressRepository.findOneBy({
-        id,
-        deletedAt: IsNull(),
+      return await this.addressRepository.findOne({
+        where: {
+          id: id,
+          deletedAt: IsNull(),
+        },
       });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {

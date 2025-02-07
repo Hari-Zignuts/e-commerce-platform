@@ -3,6 +3,7 @@ import { CreateAddressDTO } from './dto/create-address-dto';
 import { ResponseMessages } from 'src/common/constants/response-messages';
 import { AddressRepository } from './address.repository';
 import { Address } from './address.entity';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class AddressesService {
@@ -20,6 +21,12 @@ export class AddressesService {
   }
 
   async getOneAddressById(id: string): Promise<Address> {
+    if (!isUUID(id)) {
+      throw new HttpException(
+        ResponseMessages.ADDRESS.INVALID_ID,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const address = await this.addressRepository.findOneAddressById(id);
     if (!address) {
       throw new HttpException(

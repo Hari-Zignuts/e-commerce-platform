@@ -29,6 +29,7 @@ export const ResponseMessages = {
     FETCHED: 'Address data has been retrieved successfully.',
     DELETE_FAILED: 'Failed to delete the address.',
     DELETE_SUCCESS: 'The address has been deleted successfully.',
+    INVALID_ID: 'Invalid address ID provided.',
   },
   CATEGORY: {
     CREATE_FAILED: 'Failed to create the category.',
@@ -37,5 +38,6 @@ export const ResponseMessages = {
     FETCHED: 'Category data has been retrieved successfully.',
     DELETE_FAILED: 'Failed to delete the category.',
     DELETE_SUCCESS: 'The category has been deleted successfully.',
+    INVALID_ID: 'Invalid category ID provided.',
   },
 };

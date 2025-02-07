@@ -8,7 +8,12 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CreateUserDTO } from './dto/create-user-dto';
 import { UsersService } from './users.service';
 import { ResponseMessages } from 'src/common/constants/response-messages';
@@ -16,6 +21,7 @@ import { User } from './user.entity';
 import { isUUID } from 'class-validator';
 
 @ApiTags('users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

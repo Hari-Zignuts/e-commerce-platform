@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CloudinaryConfigType } from 'src/common/interfaces/cloudinary.interface';
 import { DatabaseConfig } from 'src/common/interfaces/config.interface';
 
 @Injectable()
@@ -25,6 +26,14 @@ export class ConfigAppService {
       );
     }
     return config;
+  }
+
+  getCloudinaryConfig(): CloudinaryConfigType {
+    const cloudinaryConfig: undefined = this.configService.get('cloudinary');
+    if (!cloudinaryConfig) {
+      throw new Error('Cloudinary configuration is missing.');
+    }
+    return cloudinaryConfig;
   }
 
   get(key: string): unknown {

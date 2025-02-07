@@ -13,6 +13,9 @@ import { ConfigAppModule } from './modules/config/config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { dataSourceOptions } from './database/data-source';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './modules/auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -26,9 +29,16 @@ import { dataSourceOptions } from './database/data-source';
     OrdersModule,
     ConfigAppModule,
     TypeOrmModule.forRoot(dataSourceOptions),
+    CloudinaryModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {
   constructor(readonly dataSource: DataSource) {
