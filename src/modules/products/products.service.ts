@@ -9,6 +9,7 @@ import { UploadApiResponse } from 'cloudinary';
 import { Image } from './entities/image.entity';
 import { CategoriesService } from '../categories/categories.service';
 import { ProductRepository } from './product.repository';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class ProductsService {
@@ -67,6 +68,9 @@ export class ProductsService {
   }
 
   async getOneProductById(id: string) {
+    if (!isUUID(id)) {
+      throw new BadRequestException('Invalid product id (hardcoded)');
+    }
     const product = await this.productRepository.findOneProductById(id);
     if (!product) {
       throw new BadRequestException('Product not found');
