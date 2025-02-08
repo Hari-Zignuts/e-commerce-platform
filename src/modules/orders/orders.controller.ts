@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req } from '@nestjs/common';
 import { CreateOrderDTO } from './dto/create-order-dto';
 import { OrdersService } from './orders.service';
 import {
@@ -9,10 +9,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ReqPayload } from 'src/common/interfaces/req-payload.interface';
-import { RolesGuard } from 'src/common/guards/role.guard';
 
 @Controller('orders')
-@UseGuards(RolesGuard)
 @ApiBearerAuth()
 @ApiTags('orders (admin)')
 export class OrdersController {
