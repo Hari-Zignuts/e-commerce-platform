@@ -1,12 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
-  HttpException,
   HttpStatus,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,7 +19,9 @@ import { CreateUserDTO } from './dto/create-user-dto';
 import { UsersService } from './users.service';
 import { ResponseMessages } from 'src/common/constants/response-messages';
 import { User } from './user.entity';
-import { isUUID } from 'class-validator';
+import { UserResponseDTO } from './dto/user-response-dto';
+import { UpdateUserDTO } from './dto/update-user-dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -38,34 +41,46 @@ export class UsersController {
     description: 'Invalid input',
   })
   async createUser(
-    @Body() createUserDto: CreateUserDTO,
+    @Body() createUserDTO: CreateUserDTO,
   ): Promise<{ message: string; data: User }> {
-    const newUser = await this.usersService.createUser(createUserDto);
+    const newUser = await this.usersService.createUser(createUserDTO, 'user');
     return {
       message: ResponseMessages.USER.CREATED,
       data: newUser,
     };
   }
 
+  /**
+   * @version 1.0.0
+   * @function getOneUserById
+   * @description Find a user by ID and return the user object
+   */
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a user by ID' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: ResponseMessages.USER.FETCHED,
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: ResponseMessages.GENERAL.INVALID_DATA,
-  })
-  async getOneUserById(@Param('id') id: string): Promise<User> {
-    if (!id || !isUUID(id)) {
-      throw new HttpException(
-        ResponseMessages.GENERAL.INVALID_DATA,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  async getOneUserById(@Param('id') id: string): Promise<UserResponseDTO> {
     const user = await this.usersService.getOneUserById(id);
-    return user;
+    return plainToInstance(UserResponseDTO, user, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  @Put(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update a user by ID' })
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDTO: UpdateUserDTO,
+  ) {
+    // call the service method to update the user
+    return await this.usersService.updateUserById(id, updateUserDTO);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete a user by ID' })
+  async deleteUser(@Param('id') id: string) {
+    // call the service method to delete the user
+    return await this.usersService.deleteUserById(id);
   }
 }

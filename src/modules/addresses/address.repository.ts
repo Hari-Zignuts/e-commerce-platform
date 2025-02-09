@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateAddressDTO } from './dto/create-address-dto';
 import { Address } from './address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { ResponseMessages } from 'src/common/constants/response-messages';
+import { ReqPayload } from 'src/common/interfaces/req-payload.interface';
 
 @Injectable()
 export class AddressRepository {
@@ -11,9 +11,34 @@ export class AddressRepository {
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
   ) {}
-  async createAddress(address: CreateAddressDTO): Promise<Address | null> {
+  async createAddress(address: Address): Promise<Address | null> {
     try {
       return await this.addressRepository.save(address);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new HttpException(
+        ResponseMessages.ADDRESS.DATABASE_ERROR,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findAllAddresses(req: ReqPayload): Promise<Address[]> {
+    try {
+      if (req.user.role === 'admin') {
+        return await this.addressRepository.find({
+          where: {
+            deletedAt: IsNull(),
+          },
+        });
+      }
+
+      return await this.addressRepository.find({
+        where: {
+          user: { id: req.user.id },
+          deletedAt: IsNull(),
+        },
+      });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new HttpException(

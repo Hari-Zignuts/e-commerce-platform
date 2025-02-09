@@ -4,9 +4,13 @@ export const ResponseMessages = {
     INVALID_DATA: 'Invalid data provided.',
   },
   USER: {
+    INVALID_ID: `Invalid user ID provided.`,
     CREATE_FAILED: 'Failed to create the user.',
+    DUPLICATE: 'Username or email already exists.',
     NOT_FOUND: 'The requested user was not found.',
     CREATED: 'The user account has been created successfully.',
+    DELETE_FAILED: 'Failed to delete the user.',
+    NO_UPDATE: 'No changes were made to the user.',
     FETCHED: 'User data has been retrieved successfully.',
   },
   AUTH: {
@@ -23,9 +27,11 @@ export const ResponseMessages = {
     FETCHED: 'Role data has been retrieved successfully.',
   },
   ADDRESS: {
+    DATABASE_ERROR: 'Error occurred while saving the address in the database.',
     CREATE_FAILED: 'Failed to create the address.',
+    CREATE_SUCCESS: 'The address has been created successfully.',
+    FETCH_ALL_SUCCESS: 'All addresses have been retrieved successfully.',
     NOT_FOUND: 'The requested address was not found.',
-    CREATED: 'The address has been created successfully.',
     FETCHED: 'Address data has been retrieved successfully.',
     DELETE_FAILED: 'Failed to delete the address.',
     DELETE_SUCCESS: 'The address has been deleted successfully.',

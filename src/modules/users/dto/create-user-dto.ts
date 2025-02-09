@@ -33,6 +33,8 @@ export class CreateUserDTO {
     description: 'The password of the user',
   })
   @IsString()
-  @Length(1, 25)
+  @Length(8, 25, {
+    message: 'Password must be between 8 and 25 characters long',
+  })
   password: string;
 }

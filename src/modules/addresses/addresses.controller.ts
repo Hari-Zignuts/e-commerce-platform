@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Req,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -9,28 +17,37 @@ import { AddressesService } from './addresses.service';
 import { CreateAddressDTO } from './dto/create-address-dto';
 import { ResponseMessages } from 'src/common/constants/response-messages';
 import { Address } from './address.entity';
+import { ReqPayload } from 'src/common/interfaces/req-payload.interface';
 
 @ApiTags('addresses')
 @ApiBearerAuth()
 @Controller('addresses')
 export class AddressesController {
-  constructor(private readonly addressService: AddressesService) {}
+  constructor(private readonly addressesService: AddressesService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new address' })
-  @ApiResponse({
-    status: 201,
-    description: 'The address has been successfully created.',
-  })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
   async createAddress(
     @Body() createAddressDTO: CreateAddressDTO,
+    @Req() req: ReqPayload,
   ): Promise<{ message: string; data: Address }> {
-    const newAddress =
-      await this.addressService.createAddress(createAddressDTO);
+    const newAddress = await this.addressesService.createAddress(
+      createAddressDTO,
+      req,
+    );
     return {
-      message: ResponseMessages.ADDRESS.CREATED,
+      message: ResponseMessages.ADDRESS.CREATE_SUCCESS,
       data: newAddress,
+    };
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all addresses' })
+  async getAllAddresses(@Req() req: ReqPayload) {
+    const addresses = await this.addressesService.getAllAddresses(req);
+    return {
+      message: ResponseMessages.ADDRESS.FETCH_ALL_SUCCESS,
+      data: addresses,
     };
   }
 
@@ -44,7 +61,7 @@ export class AddressesController {
   async getOneAddressById(
     @Param('id') id: string,
   ): Promise<{ message: string; data: Address }> {
-    const address = await this.addressService.getOneAddressById(id);
+    const address = await this.addressesService.getOneAddressById(id);
     return {
       message: ResponseMessages.ADDRESS.FETCHED,
       data: address,
@@ -61,7 +78,7 @@ export class AddressesController {
   async deleteOneAddressById(
     @Param('id') id: string,
   ): Promise<{ message: string; data: Address }> {
-    const deletedAddress = await this.addressService.deleteOneAddressById(id);
+    const deletedAddress = await this.addressesService.deleteOneAddressById(id);
     return {
       message: ResponseMessages.ADDRESS.DELETE_SUCCESS,
       data: deletedAddress,
