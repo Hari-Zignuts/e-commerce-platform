@@ -43,7 +43,8 @@ export class Product {
   category: Category;
 
   @OneToOne(() => Stock, (stock) => stock.product, {
-    cascade: true,
+    cascade: true, // Enables insert, update, and remove
+    orphanedRowAction: 'delete',
     onDelete: 'CASCADE',
   })
   @JoinColumn()

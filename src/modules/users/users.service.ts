@@ -15,6 +15,11 @@ export class UsersService {
     private readonly rolesService: RolesService,
   ) {}
 
+  /**
+   * @version 1.0.0
+   * @function createUser
+   * @description Create a new user
+   */
   async createUser(
     createUserDTO: CreateUserDTO,
     roleName: string,
@@ -119,27 +124,24 @@ export class UsersService {
    * @description Update a user by ID
    */
   async updateUserById(id: string, updateUserDTO: UpdateUserDTO) {
-    const user = await this.userRepository.findOneUserById(id);
-    if (!user) {
-      throw new HttpException(
-        ResponseMessages.USER.NOT_FOUND,
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    // Check if any updates were provided
     const hasUpdates = Object.keys(updateUserDTO).length > 0;
     if (!hasUpdates) {
       throw new HttpException(
-        ResponseMessages.USER.NOT_FOUND,
+        ResponseMessages.USER.NO_UPDATE,
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    // find the user by ID
+    const user = await this.getOneUserById(id);
+    // Hash the password before saving it to the database
     if (updateUserDTO.password) {
       const salt: string = await bcrypt.genSalt();
       updateUserDTO.password = await bcrypt.hash(updateUserDTO.password, salt);
     }
-
+    // Update the user object with the new values
     Object.assign(user, updateUserDTO);
+    // Save the user to the database
     return await this.userRepository.saveUser(user);
   }
 
@@ -149,22 +151,8 @@ export class UsersService {
    * @description Delete a user by ID
    */
   async deleteUserById(id: string): Promise<User> {
-    // Check if the ID is valid
-    if (!id || !isUUID(id)) {
-      throw new HttpException(
-        ResponseMessages.USER.INVALID_ID,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
     // Get the user from the database
-    const user = await this.userRepository.findOneUserById(id);
-    // Check if the user was found
-    if (!user) {
-      throw new HttpException(
-        ResponseMessages.USER.NOT_FOUND,
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    const user = await this.getOneUserById(id);
     // Delete the user from the database
     const deletedUser = await this.userRepository.deleteUser(user);
     // Check if the user was deleted

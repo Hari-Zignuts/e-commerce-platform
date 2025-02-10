@@ -1,9 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Address } from './address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { ResponseMessages } from 'src/common/constants/response-messages';
-import { ReqPayload } from 'src/common/interfaces/req-payload.interface';
 
 @Injectable()
 export class AddressRepository {
@@ -11,43 +10,53 @@ export class AddressRepository {
     @InjectRepository(Address)
     private addressRepository: Repository<Address>,
   ) {}
-  async createAddress(address: Address): Promise<Address | null> {
+
+  /**
+   * @version 1.0.0
+   * @function saveAddress
+   * @description Save or Update an address in the database
+   */
+  async saveAddress(address: Address): Promise<Address | null> {
     try {
       return await this.addressRepository.save(address);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new HttpException(
-        ResponseMessages.ADDRESS.DATABASE_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      console.log(error);
+      throw new InternalServerErrorException(
+        ResponseMessages.GENERAL.DATABASE_ERROR,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        error.message,
       );
     }
   }
 
-  async findAllAddresses(req: ReqPayload): Promise<Address[]> {
+  /**
+   * @version 1.0.0
+   * @function findAllAddresses
+   * @description Find all addresses
+   */
+  async findAllAddresses(): Promise<Address[]> {
     try {
-      if (req.user.role === 'admin') {
-        return await this.addressRepository.find({
-          where: {
-            deletedAt: IsNull(),
-          },
-        });
-      }
-
       return await this.addressRepository.find({
         where: {
-          user: { id: req.user.id },
           deletedAt: IsNull(),
         },
+        relations: ['user'],
       });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new HttpException(
+      console.log(error);
+      throw new InternalServerErrorException(
         ResponseMessages.GENERAL.DATABASE_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        error.message,
       );
     }
   }
 
+  /**
+   * @version 1.0.0
+   * @function findOneAddressById
+   * @description Find an address by ID and return the address object
+   */
   async findOneAddressById(id: string): Promise<Address | null> {
     try {
       return await this.addressRepository.findOne({
@@ -55,24 +64,33 @@ export class AddressRepository {
           id: id,
           deletedAt: IsNull(),
         },
+        relations: ['user'],
       });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new HttpException(
+      console.log(error);
+      throw new InternalServerErrorException(
         ResponseMessages.GENERAL.DATABASE_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        error.message,
       );
     }
   }
 
-  async deleteAddressById(address: Address): Promise<Address> {
+  /**
+   * @version 1.0.0
+   * @function deleteAddress
+   * @description Delete an address
+   */
+  async deleteAddress(address: Address): Promise<Address> {
     try {
-      return await this.addressRepository.softRemove(address);
+      return await this.addressRepository.remove(address);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new HttpException(
+      console.log(error);
+      throw new InternalServerErrorException(
         ResponseMessages.GENERAL.DATABASE_ERROR,
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        error.message,
       );
     }
   }

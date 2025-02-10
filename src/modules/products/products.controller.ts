@@ -8,7 +8,9 @@ import {
   Param,
   ParseFilePipe,
   Post,
+  Put,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
@@ -16,12 +18,14 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
-  ApiResponse,
-  ApiConsumes,
-  ApiBody,
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { CreateProductDTO } from './dto/create-product-dto';
+import { ResponseMessages } from 'src/common/constants/response-messages';
+import { UpdateProductDTO } from './dto/update-product-dto';
+import { RolesGuard } from 'src/common/guards/role.guard';
 
 @ApiTags('products')
 @ApiBearerAuth()
@@ -29,12 +33,17 @@ import { CreateProductDTO } from './dto/create-product-dto';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  /**
+   * @version 1.0.0
+   * @route POST /products
+   * @function createProduct
+   * @description Create a new product
+   */
   @Post()
+  @UseGuards(RolesGuard)
   @UseInterceptors(FilesInterceptor('images', 5))
   @ApiOperation({ summary: 'Create a new product' })
   @ApiConsumes('multipart/form-data')
-  @ApiResponse({ status: 201, description: 'Product created successfully.' })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiBody({
     description: 'Product data and images',
     required: true,
@@ -59,31 +68,80 @@ export class ProductsController {
       files,
     );
     return {
-      message: 'Product created',
+      message: ResponseMessages.PRODUCT.CREATED,
       product,
     };
   }
 
+  /**
+   * @version 1.0.0
+   * @route GET /products
+   * @route GET /products
+   * @function getAllProducts
+   * @description Find all products
+   */
+  @Get()
+  @ApiOperation({ summary: 'Find all products' })
+  async getAllProducts() {
+    const products = await this.productsService.getAllProducts();
+    return {
+      message: ResponseMessages.PRODUCT.FETCHED,
+      products,
+    };
+  }
+
+  /**
+   * @version 1.0.0
+   * @route GET /products/:id
+   * @function getProductById
+   * @description Get a product by id
+   */
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by id' })
-  @ApiResponse({ status: 200, description: 'Product found.' })
-  @ApiResponse({ status: 404, description: 'Product not found.' })
   async getProductById(@Param('id') id: string) {
     const product = await this.productsService.getOneProductById(id);
     return {
-      message: 'Product found',
+      message: ResponseMessages.PRODUCT.FETCHED,
       product,
     };
   }
 
+  /**
+   * @version 1.0.0
+   * @route PUT /products/:id
+   * @function updateProduct
+   * @description Update a product by id
+   */
+  @Put(':id')
+  @UseGuards(RolesGuard)
+  @ApiOperation({ summary: 'Update a product by id (admin only)' })
+  async updateProduct(
+    @Param('id') id: string,
+    @Body() updateProductDTO: UpdateProductDTO,
+  ) {
+    const product = await this.productsService.updateProduct(
+      id,
+      updateProductDTO,
+    );
+    return {
+      message: ResponseMessages.PRODUCT.UPDATED,
+      product,
+    };
+  }
+
+  /**
+   * @version 1.0.0
+   * @route DELETE /products/:id
+   * @function deleteProductById
+   * @description Delete a product by id
+   */
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a product by id' })
-  @ApiResponse({ status: 200, description: 'Product deleted.' })
-  @ApiResponse({ status: 404, description: 'Product not found.' })
+  @UseGuards(RolesGuard)
+  @ApiOperation({ summary: 'Delete a product by id (admin only)' })
   async deleteProductById(@Param('id') id: string) {
     const product = await this.productsService.deleteProductById(id);
     return {
-      message: 'Product deleted',
+      message: ResponseMessages.PRODUCT.DELETE_SUCCESS,
       product,
     };
   }

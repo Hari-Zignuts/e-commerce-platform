@@ -1,4 +1,21 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+
+export class RoleDTO {
+  @Expose()
+  id: string;
+
+  @Expose()
+  name: string;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
+
+  @Expose()
+  deletedAt?: Date;
+}
 
 export class UserResponseDTO {
   @Expose()
@@ -23,11 +40,9 @@ export class UserResponseDTO {
   updatedAt: Date;
 
   @Expose()
-  role: string;
-
-  @Exclude()
-  password: string;
-
-  @Exclude()
   deletedAt?: Date;
+
+  @Expose()
+  @Type(() => RoleDTO) // Specifies the type for nested transformation
+  role: RoleDTO;
 }

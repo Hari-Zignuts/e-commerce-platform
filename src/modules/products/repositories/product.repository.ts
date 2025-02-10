@@ -1,43 +1,30 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
-import { User } from './user.entity';
+import { Product } from '../entities/product.entity';
+import { Repository } from 'typeorm';
+import { Stock } from '../entities/stock.entity';
 import { ResponseMessages } from 'src/common/constants/response-messages';
 
 @Injectable()
-export class UserRepository {
+export class ProductRepository {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+
+    @InjectRepository(Stock)
+    private readonly stockRepository: Repository<Stock>,
   ) {}
 
   /**
    * @version 1.0.0
-   * @function saveUser
-   * @description Save or Update a user in the database
+   * @function saveProduct
+   * @description Save a new product to the database
    */
-  async saveUser(user: User): Promise<User | null> {
+  async saveProduct(product: Product) {
     try {
-      return await this.userRepository.save(user);
+      return await this.productRepository.save(product);
     } catch (error) {
       console.log(error);
-      // Handle duplicate username or email here
-      if (
-        error instanceof QueryFailedError &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        error.driverError.code === '23505'
-      ) {
-        throw new HttpException(
-          ResponseMessages.USER.DUPLICATE,
-          HttpStatus.NOT_ACCEPTABLE,
-        );
-      }
-      // Handle other database errors here
       throw new InternalServerErrorException(
         ResponseMessages.GENERAL.DATABASE_ERROR,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
@@ -48,14 +35,14 @@ export class UserRepository {
 
   /**
    * @version 1.0.0
-   * @function findOneUserById
-   * @description Find a user by ID and return the user object
+   * @function findOneProductById
+   * @description Find a product by ID and return the product object
    */
-  async findOneUserById(id: string): Promise<User | null> {
+  async findOneProductById(id: string) {
     try {
-      return await this.userRepository.findOne({
-        where: { id: id },
-        relations: ['role'],
+      return await this.productRepository.findOne({
+        where: { id },
+        relations: ['category', 'images', 'stock'],
       });
     } catch (error) {
       console.log(error);
@@ -69,14 +56,13 @@ export class UserRepository {
 
   /**
    * @version 1.0.0
-   * @function findOneUserByUsername
-   * @description Find a user by username and return the user object
+   * @function findAllProducts
+   * @description Find all products in the database
    */
-  async findOneUserByUsername(username: string): Promise<User | null> {
+  async findAllProducts() {
     try {
-      return await this.userRepository.findOne({
-        where: { username: username },
-        relations: ['role'],
+      return await this.productRepository.find({
+        relations: ['category', 'images', 'stock'],
       });
     } catch (error) {
       console.log(error);
@@ -90,13 +76,26 @@ export class UserRepository {
 
   /**
    * @version 1.0.0
-   * @function findAllUsers
-   * @description Find all users and return an array of user objects
+   * @function deleteProduct
+   * @description Delete a product from the database
    */
-  async findAllUsers(): Promise<User[]> {
+  async deleteProduct(product: Product) {
     try {
-      return await this.userRepository.find({
-        relations: ['role'],
+      return await this.productRepository.remove(product);
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        ResponseMessages.GENERAL.DATABASE_ERROR,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        error.message,
+      );
+    }
+  }
+
+  async findOneStockById(id: string) {
+    try {
+      return await this.stockRepository.findOne({
+        where: { id },
       });
     } catch (error) {
       console.log(error);
@@ -108,14 +107,9 @@ export class UserRepository {
     }
   }
 
-  /**
-   * @version 1.0.0
-   * @function deleteUser
-   * @description Delete a user
-   */
-  async deleteUser(user: User): Promise<User> {
+  async updateStock(stock: Stock) {
     try {
-      return await this.userRepository.remove(user);
+      return await this.stockRepository.save(stock);
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(

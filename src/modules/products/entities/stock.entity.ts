@@ -7,7 +7,7 @@ export class Stock {
   id: string;
 
   @Column({ type: 'int', default: 0 })
-  stock: number;
+  quantity: number;
 
   @OneToOne(() => Product, (product) => product.stock, { onDelete: 'CASCADE' })
   product: Product;
