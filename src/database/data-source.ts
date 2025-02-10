@@ -28,7 +28,7 @@ export const dataSourceOptions: DataSourceOptions = {
     LikeProduct,
     Address,
   ],
-  synchronize: true,
+  synchronize: false,
   migrations: [`src/database/migrations/*.ts`],
 };
 
