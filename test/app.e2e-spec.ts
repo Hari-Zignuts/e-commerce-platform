@@ -18,6 +18,7 @@ describe('Test Environment', () => {
 
     dataSource = app.get(DataSource);
     await dataSource.runMigrations();
+    // await seedDatabase(dataSource);
   });
 
   afterAll(async () => {

@@ -18,10 +18,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "NODE_ENV=test jest --config ./test/jest-e2e.json",
+    "test:unit": "NODE_ENV=test jest --config ./test/jest-unit.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
     "migration:generate": "npm run typeorm -- migration:generate src/database/migrations/InitialMigration -d src/database/data-source.ts",
     "migration:run": "npm run typeorm -- migration:run -d src/database/data-source.ts",
-    "seed": "ts-node -r tsconfig-paths/register src/database/seeders/seed-database.ts"
+    "seed:dev": "ts-node -r tsconfig-paths/register src/database/seeders/seedRunner.ts",
+    "seed:test": "NODE_ENV=test ts-node -r tsconfig-paths/register src/database/seeders/seedRunner.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

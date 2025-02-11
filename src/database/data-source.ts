@@ -38,7 +38,6 @@ export const dataSourceOptions: DataSourceOptions = {
       ? ['src/database/migrations/*.ts']
       : ['dist/database/migrations/*.js'],
 };
-
 const dataSource = new DataSource(dataSourceOptions);
 
 export default dataSource;

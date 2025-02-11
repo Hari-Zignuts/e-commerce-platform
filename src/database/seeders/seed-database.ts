@@ -1,10 +1,10 @@
 import { hash } from 'bcrypt';
-import dataSource from '../data-source'; // ✅ Correct import
+import { DataSource } from 'typeorm';
 import { Role } from '../../modules/roles/role.entity';
 import { User } from '../../modules/users/user.entity';
 
-const seedDatabase = async () => {
-  await dataSource.initialize(); // ✅ Initialize the database connection
+export const seedDatabase = async (dataSource: DataSource) => {
+  console.log('🚀 Starting database seeding...');
 
   const roleRepository = dataSource.getRepository(Role);
   const userRepository = dataSource.getRepository(User);
@@ -34,7 +34,7 @@ const seedDatabase = async () => {
       console.error('❌ Admin role not found! Seeding failed.');
       process.exit(1);
     }
-    const hashedPassword = await hash('Admin@123', 10); // Hash password
+    const hashedPassword = await hash('Admin@123', 10);
     await userRepository.insert({
       username: 'admin',
       email: 'admin@example.com',
@@ -46,10 +46,4 @@ const seedDatabase = async () => {
   }
 
   console.log('✅ Database seeding completed!');
-  await dataSource.destroy(); // ✅ Close connection after seeding
 };
-
-seedDatabase().catch((error) => {
-  console.error('❌ Seeding failed:', error);
-  process.exit(1);
-});

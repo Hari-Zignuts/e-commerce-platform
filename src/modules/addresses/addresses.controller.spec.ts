@@ -1,18 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AddressesController } from './addresses.controller';
+import { AddressesService } from './addresses.service';
 
 describe('AddressesController', () => {
-  let controller: AddressesController;
+  let addressesController: AddressesController;
+  let mockAddressesService: jest.Mocked<Partial<AddressesService>>;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    mockAddressesService = {
+      createAddress: jest.fn(),
+      getAllAddresses: jest.fn(),
+      getOneAddressById: jest.fn(),
+      updateAddressById: jest.fn(),
+      deleteOneAddressById: jest.fn(),
+    };
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [AddressesController],
+      providers: [
+        {
+          provide: AddressesService,
+          useValue: mockAddressesService,
+        },
+      ],
     }).compile();
 
-    controller = module.get<AddressesController>(AddressesController);
+    addressesController =
+      moduleRef.get<AddressesController>(AddressesController);
   });
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
+    expect(addressesController).toBeDefined();
+  });
+
+  it('should create a new address', async () => {
   });
 });
