@@ -67,12 +67,18 @@ export class UsersController {
   @Get('id/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get a user by ID' })
-  async getOneUserById(@Param('id') id: string): Promise<UserResponseDTO> {
+  async getOneUserById(
+    @Param('id') id: string,
+  ): Promise<{ message: string; data: UserResponseDTO }> {
     const user = await this.usersService.getOneUserById(id);
     // Transform the user entity to UserResponseDTO
-    return plainToInstance(UserResponseDTO, user, {
+    const filterUser = plainToInstance(UserResponseDTO, user, {
       excludeExtraneousValues: true,
     });
+    return {
+      message: ResponseMessages.USER.FETCHED,
+      data: filterUser,
+    };
   }
 
   @Get('username/:username')
@@ -80,11 +86,15 @@ export class UsersController {
   @ApiOperation({ summary: 'Get a user by username' })
   async getOneUserByUsername(
     @Param('username') username: string,
-  ): Promise<UserResponseDTO> {
+  ): Promise<{ message: string; data: UserResponseDTO }> {
     const user = await this.usersService.getOneUserByUsername(username);
-    return plainToInstance(UserResponseDTO, user, {
+    const filterUser = plainToInstance(UserResponseDTO, user, {
       excludeExtraneousValues: true,
     });
+    return {
+      message: ResponseMessages.USER.FETCHED,
+      data: filterUser,
+    };
   }
 
   /**
@@ -101,7 +111,11 @@ export class UsersController {
     @Body() updateUserDTO: UpdateUserDTO,
   ) {
     // call the service method to update the user
-    return await this.usersService.updateUserById(id, updateUserDTO);
+    const user = await this.usersService.updateUserById(id, updateUserDTO);
+    return {
+      message: ResponseMessages.USER.UPDATE_SUCCESS,
+      data: user,
+    };
   }
 
   /**
@@ -115,7 +129,11 @@ export class UsersController {
   @ApiOperation({ summary: 'Delete a user by ID' })
   async deleteUser(@Param('id') id: string) {
     // call the service method to delete the user
-    return await this.usersService.deleteUserById(id);
+    const user = await this.usersService.deleteUserById(id);
+    return {
+      message: ResponseMessages.USER.DELETE_SUCCESS,
+      data: user,
+    };
   }
 
   /**
@@ -128,12 +146,16 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all users (admin only)' })
-  async getAllUsers(): Promise<UserResponseDTO[]> {
+  async getAllUsers(): Promise<{ message: string; data: UserResponseDTO[] }> {
     const users = await this.usersService.getAllUsers();
-    return users.map((user) =>
+    const filterUsers = users.map((user) =>
       plainToInstance(UserResponseDTO, user, {
         excludeExtraneousValues: true,
       }),
     );
+    return {
+      message: ResponseMessages.USER.FETCHED,
+      data: filterUsers,
+    };
   }
 }

@@ -44,11 +44,11 @@ export class AuthController {
   })
   async login(
     @Body() loginDTO: LoginDTO,
-  ): Promise<{ message: string; jwt: string }> {
+  ): Promise<{ message: string; token: string }> {
     const access_token = await this.authService.login(loginDTO);
     return {
       message: ResponseMessages.AUTH.LOGIN_SUCCESS,
-      jwt: access_token,
+      token: access_token,
     };
   }
 }

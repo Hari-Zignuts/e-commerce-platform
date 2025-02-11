@@ -147,10 +147,13 @@ export class RolesController {
   @Delete(':id')
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Delete a role by ID (admin only)' })
-  async deleteRole(@Param('id') id: string): Promise<{ message: string }> {
-    await this.rolesService.deleteRole(id);
+  async deleteRole(
+    @Param('id') id: string,
+  ): Promise<{ message: string; data: Role }> {
+    const role = await this.rolesService.deleteRole(id);
     return {
       message: ResponseMessages.ROLE.DELETED_SUCCESS,
+      data: role,
     };
   }
 }

@@ -34,9 +34,12 @@ export const seedDatabase = async (dataSource: DataSource) => {
       console.error('❌ Admin role not found! Seeding failed.');
       process.exit(1);
     }
-    const hashedPassword = await hash('Admin@123', 10);
+    const hashedPassword = await hash(
+      process.env.USER_PASSWORD || 'admin123',
+      10,
+    );
     await userRepository.insert({
-      username: 'admin',
+      username: process.env.ADMIN_USERNAME || 'admin',
       email: 'admin@example.com',
       firstName: 'Super',
       lastName: 'Admin',

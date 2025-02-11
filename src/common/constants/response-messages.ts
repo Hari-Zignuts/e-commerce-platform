@@ -12,6 +12,9 @@ export const ResponseMessages = {
     DELETE_FAILED: 'Failed to delete the user.',
     NO_UPDATE: 'No changes were made to the user.',
     FETCHED: 'User data has been retrieved successfully.',
+    UPDATE_FAILED: 'Failed to update the user.',
+    UPDATE_SUCCESS: 'User updated successfully.',
+    DELETE_SUCCESS: 'The user has been deleted successfully.',
   },
   AUTH: {
     SIGNUP_SUCCESS: 'User account created successfully.',
