@@ -18,7 +18,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       request.route.path === '/auth/login' ||
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      request.route.path === '/auth/signup'
+      request.route.path === '/auth/signup' ||
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      request.route.path === '/test'
     ) {
       return true;
     }
