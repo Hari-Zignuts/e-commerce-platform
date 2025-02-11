@@ -29,7 +29,11 @@ export const dataSourceOptions: DataSourceOptions = {
     Address,
   ],
   synchronize: false,
-  migrations: [`src/database/migrations/*.ts`],
+  // here if i write migrations: ['dist/database/migrations/*.ts'] it will not work
+  // because the migrations files are compiled to js files
+  // if i write src/database/migrations/*.ts it will not work because the migrations files are not compiled yet
+  // and give me circular dependency error
+  migrations: [`dist/database/migrations/*.ts`],
 };
 
 const dataSource = new DataSource(dataSourceOptions);
