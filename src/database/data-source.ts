@@ -33,7 +33,10 @@ export const dataSourceOptions: DataSourceOptions = {
   // because the migrations files are compiled to js files
   // if i write src/database/migrations/*.ts it will not work because the migrations files are not compiled yet
   // and give me circular dependency error
-  migrations: [`dist/database/migrations/*.ts`],
+  migrations:
+    process.env.NODE_ENV === 'test'
+      ? ['src/database/migrations/*.ts']
+      : ['dist/database/migrations/*.js'],
 };
 
 const dataSource = new DataSource(dataSourceOptions);
