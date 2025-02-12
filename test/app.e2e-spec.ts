@@ -30,10 +30,7 @@ describe('Test Environment', () => {
   const product: Product[] = [];
   const order: Order[] = [];
 
-  const token = {
-    user: '',
-    admin: '',
-  };
+  const token = { user: '', admin: '' };
   const testUser: CreateUserDTO = {
     email: 'testuser@gmail.com',
     username: 'testuser',
@@ -101,10 +98,7 @@ describe('Test Environment', () => {
       it('should login a user', async () => {
         const res = await request(app.getHttpServer())
           .post('/auth/login')
-          .send({
-            username: testUser.username,
-            password: testUser.password,
-          });
+          .send({ username: testUser.username, password: testUser.password });
         token.user = res.body.token;
         expect(res.status).toBe(200);
         expect(res.body.message).toBe('User logged in successfully.');
@@ -448,8 +442,7 @@ describe('Test Environment', () => {
         .field('price', product.price)
         .field('stock', product.stock)
         .field('category', category[0].id)
-        .attach('images', path.join(__dirname, 'test-files/image1.jpg'))
-        .attach('images', path.join(__dirname, 'test-files/image2.jpg'));
+        .attach('images', path.join(__dirname, 'test-files/image1.jpg'));
     };
     afterAll(async () => {
       const res = await createProduct(testProductDTO);
