@@ -69,7 +69,7 @@ export class ProductsController {
     );
     return {
       message: ResponseMessages.PRODUCT.CREATED,
-      product,
+      data: product,
     };
   }
 
@@ -86,7 +86,7 @@ export class ProductsController {
     const products = await this.productsService.getAllProducts();
     return {
       message: ResponseMessages.PRODUCT.FETCHED,
-      products,
+      data: products,
     };
   }
 
@@ -102,7 +102,7 @@ export class ProductsController {
     const product = await this.productsService.getOneProductById(id);
     return {
       message: ResponseMessages.PRODUCT.FETCHED,
-      product,
+      data: product,
     };
   }
 
@@ -125,7 +125,7 @@ export class ProductsController {
     );
     return {
       message: ResponseMessages.PRODUCT.UPDATED,
-      product,
+      data: product,
     };
   }
 
@@ -142,7 +142,7 @@ export class ProductsController {
     const product = await this.productsService.deleteProductById(id);
     return {
       message: ResponseMessages.PRODUCT.DELETE_SUCCESS,
-      product,
+      data: product,
     };
   }
 }

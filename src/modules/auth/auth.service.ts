@@ -20,7 +20,7 @@ export class AuthService {
 
   async login(loginDTO: LoginDTO): Promise<string> {
     const user = await this.usersService.getOneUserByUsername(
-      loginDTO.useranme,
+      loginDTO.username,
     );
     if (!user) {
       throw new HttpException(

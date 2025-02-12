@@ -11,6 +11,11 @@ import { Category } from 'src/modules/categories/category.entity';
 import { CreateAddressDTO } from 'src/modules/addresses/dto/create-address-dto';
 import { Address } from 'src/modules/addresses/address.entity';
 import { Role } from 'src/modules/roles/role.entity';
+import * as path from 'path';
+import { Product } from 'src/modules/products/entities/product.entity';
+import { CreateProductDTO } from 'src/modules/products/dto/create-product-dto';
+import { Order } from 'src/modules/orders/order.entity';
+import { LikeProduct } from 'src/modules/likes/like.entity';
 
 describe('Test Environment', () => {
   let app: INestApplication;
@@ -19,6 +24,9 @@ describe('Test Environment', () => {
   const user: User[] = [];
   const category: Category[] = [];
   const address: Address[] = [];
+  const product: Product[] = [];
+  const order: Order[] = [];
+
   const token = {
     user: '',
     admin: '',
@@ -50,6 +58,9 @@ describe('Test Environment', () => {
   });
 
   afterAll(async () => {
+    await request(app.getHttpServer())
+      .delete(`/products/${product[0].id}`)
+      .set('Authorization', `Bearer ${token.admin}`);
     await dataSource.destroy();
     await app.close();
   });
@@ -88,7 +99,7 @@ describe('Test Environment', () => {
         const res = await request(app.getHttpServer())
           .post('/auth/login')
           .send({
-            useranme: testUser.username,
+            username: testUser.username,
             password: testUser.password,
           });
         token.user = res.body.token;
@@ -102,7 +113,7 @@ describe('Test Environment', () => {
       it('should login a admin', async () => {
         const res = await request(app.getHttpServer())
           .post('/auth/login')
-          .send({ useranme: testAdmin.username, password: testAdmin.password });
+          .send({ username: testAdmin.username, password: testAdmin.password });
         token.admin = res.body.token;
         expect(res.status).toBe(200);
         expect(res.body.message).toBe('User logged in successfully.');
@@ -115,7 +126,7 @@ describe('Test Environment', () => {
     afterAll(async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ useranme: testUser.username, password: testUser.password });
+        .send({ username: testUser.username, password: testUser.password });
       token.user = res.body.token;
     });
 
@@ -191,7 +202,6 @@ describe('Test Environment', () => {
         expect(res.body.data.id).toBe(user[0].id);
         expect(res.body.data.email).toBe(user[0].email);
         expect(res.body.data.username).toBe(user[0].username);
-        user.push(res.body.data);
       });
     });
   });
@@ -271,6 +281,7 @@ describe('Test Environment', () => {
       title: 'Category 1',
       description: 'Category 1 description',
     };
+
     afterAll(async () => {
       const res = await request(app.getHttpServer())
         .post('/categories')
@@ -278,16 +289,17 @@ describe('Test Environment', () => {
         .send(testCategoryDTO);
       category.push(res.body.data);
     });
+
     describe('POST /categories', () => {
       it('should create a new category', async () => {
         const res = await request(app.getHttpServer())
           .post('/categories')
           .set('Authorization', `Bearer ${token.admin}`)
           .send(testCategoryDTO);
-        expect(res.status).toBe(201);
         expect(res.body.message).toBe(
           'The category has been created successfully.',
         );
+        expect(res.status).toBe(201);
         expect(res.body.data).toHaveProperty('id');
         expect(res.body.data.title).toBe(testCategoryDTO.title);
         category.push(res.body.data);
@@ -411,6 +423,228 @@ describe('Test Environment', () => {
         expect(res.status).toBe(200);
         expect(res.body.data.street).toBe('5678 Elm St');
         address.shift();
+      });
+    });
+  });
+
+  describe('Products', () => {
+    const testProductDTO: CreateProductDTO = {
+      title: 'Product 1',
+      description: 'Product 1 description',
+      price: 100,
+      category: '',
+      stock: 10,
+      images: '',
+    };
+    const createProduct = async (product: CreateProductDTO) => {
+      return await request(app.getHttpServer())
+        .post('/products')
+        .set('Authorization', `Bearer ${token.admin}`)
+        .field('title', product.title)
+        .field('description', product.description)
+        .field('price', product.price)
+        .field('stock', product.stock)
+        .field('category', category[0].id)
+        .attach('images', path.join(__dirname, 'test-files/image1.jpg'))
+        .attach('images', path.join(__dirname, 'test-files/image2.jpg'));
+    };
+    afterAll(async () => {
+      const res = await createProduct(testProductDTO);
+      product.push(res.body.data);
+    });
+    describe('POST /products', () => {
+      it('should create a new product', async () => {
+        const res = await createProduct(testProductDTO);
+        expect(res.status).toBe(201);
+        expect(res.body.message).toBe(
+          'The product has been created successfully.',
+        );
+        expect(res.body.data).toHaveProperty('id');
+        expect(res.body.data.title).toBe('Product 1');
+        product.push(res.body.data);
+      });
+    });
+
+    describe('GET /products', () => {
+      it('should return all products', async () => {
+        const res = await request(app.getHttpServer())
+          .get('/products')
+          .set('Authorization', `Bearer ${token.user}`);
+        expect(res.status).toBe(200);
+        expect(res.body.data).toHaveLength(1);
+      });
+    });
+
+    describe('GET /products/:id', () => {
+      it('should return a product', async () => {
+        const res = await request(app.getHttpServer())
+          .get(`/products/${product[0].id}`)
+          .set('Authorization', `Bearer ${token.user}`);
+        expect(res.status).toBe(200);
+        expect(res.body.data.id).toBe(product[0].id);
+        expect(res.body.data.title).toBe('Product 1');
+      });
+    });
+
+    describe('PUT /products/:id', () => {
+      it('should update a product', async () => {
+        const res = await request(app.getHttpServer())
+          .put(`/products/${product[0].id}`)
+          .set('Authorization', `Bearer ${token.admin}`)
+          .send({ title: 'Product 2' });
+        expect(res.status).toBe(200);
+        expect(res.body.data.id).toBe(product[0].id);
+        expect(res.body.data.title).toBe('Product 2');
+      });
+    });
+
+    describe('DELETE /products/:id', () => {
+      it('should delete a product', async () => {
+        const res = await request(app.getHttpServer())
+          .delete(`/products/${product[0].id}`)
+          .set('Authorization', `Bearer ${token.admin}`);
+        expect(res.status).toBe(200);
+        expect(res.body.data.title).toBe('Product 2');
+        product.shift();
+      });
+    });
+  });
+
+  describe('Orders', () => {
+    describe('POST /orders', () => {
+      it('should create a new order', async () => {
+        const res = await request(app.getHttpServer())
+          .post('/orders')
+          .set('Authorization', `Bearer ${token.user}`)
+          .send({
+            product: product[0].id,
+            address: address[0].id,
+            quantity: 2,
+          });
+        expect(res.status).toBe(201);
+        expect(res.body.message).toBe(
+          'The order has been created successfully.',
+        );
+        expect(res.body.data).toHaveProperty('id');
+        expect(res.body.data.product.id).toBe(product[0].id);
+        expect(res.body.data.address.id).toBe(address[0].id);
+        order.push(res.body.data);
+      });
+    });
+
+    describe('GET /orders', () => {
+      it('should return all orders', async () => {
+        const res = await request(app.getHttpServer())
+          .get('/orders')
+          .set('Authorization', `Bearer ${token.user}`);
+        expect(res.status).toBe(200);
+        expect(res.body.data).toHaveLength(1);
+      });
+    });
+
+    describe('GET /orders/:id', () => {
+      it('should return an order', async () => {
+        const res = await request(app.getHttpServer())
+          .get(`/orders/${order[0].id}`)
+          .set('Authorization', `Bearer ${token.user}`);
+        expect(res.status).toBe(200);
+        expect(res.body.data.id).toBe(order[0].id);
+        expect(res.body.data.product.id).toBe(product[0].id);
+        expect(res.body.data.address.id).toBe(address[0].id);
+      });
+    });
+
+    describe('GET /orders/all-users', () => {
+      it('should return all orders for all users', async () => {
+        const res = await request(app.getHttpServer())
+          .get('/orders/all-users')
+          .set('Authorization', `Bearer ${token.admin}`);
+        expect(res.status).toBe(200);
+        expect(res.body.data).toHaveLength(1);
+      });
+    });
+
+    describe('PUT /orders/:id/complete', () => {
+      it('should update an order', async () => {
+        const res = await request(app.getHttpServer())
+          .put(`/orders/${order[0].id}/complete`)
+          .set('Authorization', `Bearer ${token.admin}`)
+          .send({ status: 'completed' });
+        expect(res.status).toBe(200);
+        expect(res.body.data.id).toBe(order[0].id);
+        expect(res.body.data.status).toBe('completed');
+      });
+    });
+
+    describe('PUT /orders/:id/cancel', () => {
+      it('should update an order', async () => {
+        const res = await request(app.getHttpServer())
+          .put(`/orders/${order[0].id}/cancel`)
+          .set('Authorization', `Bearer ${token.admin}`)
+          .send({ status: 'cancelled' });
+        expect(res.status).toBe(200);
+        expect(res.body.data.id).toBe(order[0].id);
+        expect(res.body.data.status).toBe('cancelled');
+      });
+    });
+
+    describe('DELETE /orders/:id', () => {
+      it('should delete an order', async () => {
+        const res = await request(app.getHttpServer())
+          .delete(`/orders/${order[0].id}`)
+          .set('Authorization', `Bearer ${token.user}`);
+        expect(res.status).toBe(200);
+        order.shift();
+      });
+    });
+  });
+
+  describe('Like', () => {
+    const like: LikeProduct[] = [];
+    describe('POST /likes', () => {
+      it('should create a new like', async () => {
+        const res = await request(app.getHttpServer())
+          .post('/likes')
+          .set('Authorization', `Bearer ${token.user}`)
+          .query({ productId: product[0].id });
+
+        expect(res.status).toBe(201);
+        expect(res.body).toHaveProperty('id');
+        expect(res.body.product.id).toBe(product[0].id);
+        expect(res.body.user.id).toBe(user[0].id);
+        like.push(res.body);
+      });
+    });
+
+    describe('GET /likes', () => {
+      it('should return all likes', async () => {
+        const res = await request(app.getHttpServer())
+          .get('/likes')
+          .set('Authorization', `Bearer ${token.user}`);
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveLength(1);
+      });
+    });
+
+    describe('GET /likes/:id', () => {
+      it('should return a like', async () => {
+        const res = await request(app.getHttpServer())
+          .get(`/likes/${like[0].id}`)
+          .set('Authorization', `Bearer ${token.user}`);
+        expect(res.status).toBe(200);
+        expect(res.body.id).toBe(like[0].id);
+        expect(res.body.product.id).toBe(product[0].id);
+        expect(res.body.user.id).toBe(user[0].id);
+      });
+    });
+
+    describe('DELETE /likes/:id', () => {
+      it('should delete a like', async () => {
+        const res = await request(app.getHttpServer())
+          .delete(`/likes/${like[0].id}`)
+          .set('Authorization', `Bearer ${token.user}`);
+        expect(res.status).toBe(200);
+        like.shift();
       });
     });
   });

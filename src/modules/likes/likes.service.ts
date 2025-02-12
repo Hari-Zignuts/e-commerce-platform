@@ -14,10 +14,11 @@ export class LikesService {
     private readonly productService: ProductsService,
   ) {}
 
-  async createLike(userId: string, productId: string) {
-    if (!userId || !productId || !isUUID(userId) || !isUUID(productId)) {
+  async createLike(req: ReqPayload, productId: string) {
+    if (!productId || !isUUID(productId)) {
       throw new Error('User ID and Product ID are required');
     }
+    const userId = req.user.id;
     const like = new LikeProduct();
     const user = await this.userService.getOneUserById(userId);
     const product = await this.productService.getOneProductById(productId);

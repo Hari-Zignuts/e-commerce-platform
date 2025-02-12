@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, IsIn } from 'class-validator';
 export class UpdateOrderStatusDTO {
   @ApiPropertyOptional({
     description: 'The status of the order',
-    example: 'delivered',
+    example: 'completed',
   })
   @IsString()
   @IsNotEmpty()

@@ -25,13 +25,12 @@ export class LikesController {
 
   @Post()
   @ApiOperation({ summary: 'Create a like' })
-  @ApiQuery({ name: 'userId', required: true })
   @ApiQuery({ name: 'productId', required: true })
   async createLike(
-    @Query('userId') userId: string,
     @Query('productId') productId: string,
+    @Req() req: ReqPayload,
   ) {
-    return await this.likesService.createLike(userId, productId);
+    return await this.likesService.createLike(req, productId);
   }
 
   @Get()
