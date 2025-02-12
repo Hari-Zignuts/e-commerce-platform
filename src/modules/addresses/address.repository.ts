@@ -84,7 +84,6 @@ export class AddressRepository {
   async deleteAddress(address: Address): Promise<Address> {
     try {
       return await this.addressRepository.remove(address);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException(

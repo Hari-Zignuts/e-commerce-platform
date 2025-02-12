@@ -3,7 +3,7 @@ import { AddressesController } from './addresses.controller';
 import { AddressesService } from './addresses.service';
 import {
   mockAddress,
-  mockReqPayload,
+  mockReqPayloadUser,
   mockUser,
 } from 'src/common/mock/entity-mock';
 import { mockCreateAddressDTO } from 'src/common/mock/dto-mock';
@@ -48,12 +48,12 @@ describe('AddressesController', () => {
 
     const response = await addressesController.createAddress(
       mockCreateAddressDTO,
-      mockReqPayload,
+      mockReqPayloadUser,
     );
 
     expect(mockAddressesService.createAddress).toHaveBeenCalledWith(
       mockCreateAddressDTO,
-      mockReqPayload,
+      mockReqPayloadUser,
     );
     expect(response).toEqual({
       message: ResponseMessages.ADDRESS.CREATE_SUCCESS,
@@ -82,11 +82,12 @@ describe('AddressesController', () => {
       mockAddresses,
     );
 
-    const response = await addressesController.getAllAddresses(mockReqPayload);
+    const response =
+      await addressesController.getAllAddresses(mockReqPayloadUser);
 
     expect(mockAddressesService.getAllAddresses).toHaveBeenCalled();
     const exprectedAddresses = mockAddresses.filter(
-      (address) => address.user.id === mockReqPayload.user.id,
+      (address) => address.user.id === mockReqPayloadUser.user.id,
     );
     expect(response).toEqual({
       message: ResponseMessages.ADDRESS.FETCH_ALL_SUCCESS,
